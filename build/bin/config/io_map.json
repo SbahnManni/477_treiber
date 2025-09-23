@@ -1,0 +1,59 @@
+{
+  "pcf8574_inputs": [
+    {"_comment" : "BUS, BOARD-Adress, pin on board, channel in LOCSIM, Name"},
+    { "bus": 1, "addr": "0x38", "pin": 0, "kanal": 0, "name": "SIFA_HAND" },
+    { "bus": 1, "addr": "0x38", "pin": 1, "kanal": 1, "name": "SIFA_FUSS" },
+    { "bus": 1, "addr": "0x38", "pin": 2, "kanal": 2, "name": "HAPUTSCHALTER_0" },
+    { "bus": 1, "addr": "0x38", "pin": 3, "kanal": 3, "name": "HAPUTSCHALTER_1" },
+    { "bus": 1, "addr": "0x38", "pin": 4, "kanal": 4, "name": "STROMABNEHMER_0" },
+    { "bus": 1, "addr": "0x38", "pin": 5, "kanal": 5, "name": "STROMABNEHMER_1" },
+    { "bus": 1, "addr": "0x38", "pin": 6, "kanal": 6, "name": "FAHRSCHALTER" },
+    { "bus": 1, "addr": "0x38", "pin": 7, "kanal": 7, "name": "EP_LOESEN" }
+  ],
+  "analog_inputs": [
+    {"_comment" : "BUS, BOARD-Adress, pin on board, channel in LOCSIM, Name, pollinrate"},
+    { "bus": 1, "addr": "0x69", "pin": 0, "kanal": 8, "name": "HBL_DRUCK", "rate_hz": 1 },
+    { "bus": 1, "addr": "0x69", "pin": 1, "kanal": 9, "name": "HL_DRUCK", "rate_hz": 1 },
+    { "bus": 1, "addr": "0x69", "pin": 2, "kanal": 10, "name": "C_DRUCK", "rate_hz": 1 },
+    { "bus": 1, "addr": "0x69", "pin": 3, "kanal": 11, "name": "HANDBREMSE", "rate_hz": 1 }
+  ],
+  "pcf8574_outputs": [
+    {"_comment" : "BUS, BOARD-Adress, pin on board, channel in LOCSIM, Name"},
+    { "bus": 1, "addr": "0x20", "pin": 0, "kanal": 12, "name": "LM_SIFA" },
+    { "bus": 1, "addr": "0x20", "pin": 1, "kanal": 13, "name": "LM_HAUPTSCHALTER" },
+    { "bus": 1, "addr": "0x20", "pin": 2, "kanal": 14, "name": "STOERLAMPE_1" },
+    { "bus": 1, "addr": "0x20", "pin": 3, "kanal": 15, "name": "STUERLAMPE_2" },
+    { "bus": 1, "addr": "0x20", "pin": 4, "kanal": 16, "name": "SIFA_SUMMER" },
+    { "bus": 1, "addr": "0x20", "pin": 5, "kanal": 17, "name": "MV_EP_AN" },
+    { "bus": 1, "addr": "0x20", "pin": 6, "kanal": 18, "name": "MV_EP_LOE" },
+    { "bus": 1, "addr": "0x20", "pin": 7, "kanal": 19, "name": "KOMPRESSOR" }
+  ],
+  "analog_outputs": [
+    {"_comment" : "BUS, BOARD-Adress, pin on board, channel in LOCSIM, Name"},
+    { "bus": 1, "addr": "0x58", "pin": 0, "kanal": 20, "name": "TACHO" },
+    { "bus": 1, "addr": "0x58", "pin": 1, "kanal": 21, "name": "FAHRSPANNUNG" },
+    { "bus": 1, "addr": "0x58", "pin": 2, "kanal": 22, "name": "230V" },
+    { "bus": 1, "addr": "0x58", "pin": 3, "kanal": 23, "name": "110V" }
+
+  ],
+  "mpu9250": [
+    {
+      "bus": 1,
+      "addr": "0x68",
+      "name": "imu",
+      "channels": [
+        {"_comment" : " pin ist nur symbolisch um das vorhandene Backend zu nutzen"},
+        {"_comment" : "Wertetyp, Kanal(Locsim)"},
+        { "pin": "ax",    "kanal": 5001 },
+        { "pin": "ay",    "kanal": 5002 },
+        { "pin": "az",    "kanal": 5003 },
+        { "pin": "gx",    "kanal": 5011 },
+        { "pin": "gy",    "kanal": 5012 },
+        { "pin": "gz",    "kanal": 5013 },
+        { "pin": "pitch", "kanal": 5021 },
+        { "pin": "roll",  "kanal": 5022 },
+        { "pin": "yaw",   "kanal": 5023 }
+      ]
+    }
+  ]
+}

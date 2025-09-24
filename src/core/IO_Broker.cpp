@@ -23,22 +23,22 @@ IoBroker::IoBroker(i2c::I2C_Manager& mgr) : mgr_(mgr) {}
 
 void IoBroker::addPcfInputMapping(int bus, int addr, int pin, int kanal, std::string name) {
     in_map_[key(bus, addr, pin, 0)] = kanal;
-    if (!name.empty()) names_[kanal] = std::move(name);
+    if (!name.empty()) names_by_ch_[chan_key(kanal,  /*analog=*/ false)] = std::move(name);
 }
 void IoBroker::addAnalogInputMapping(int bus, int addr, int pin, int kanal, std::string name){
     in_map_[key(bus, addr, pin, 1)] = kanal;
     std::cout << "bus " << bus << " addr " << addr << " pin " << pin << " kanal " << kanal << " name " << name << "\n";
-    if (!name.empty()) names_[kanal] = std::move(name);
+    if (!name.empty()) names_by_ch_[chan_key(kanal, /*analog=*/ true)] = std::move(name);
 }
 
 
 void IoBroker::addDigiOutMapping   (int bus, int addr, int pin, int kanal, std::string name){
-        out_map_[kanal] = OutTuple{bus, addr, pin, false} ;
-    if (!name.empty()) names_[kanal] = std::move(name);
+        out_map_[chan_key(kanal, /*analog=*/false)] = OutTuple{bus, addr, pin, false} ;
+    if (!name.empty()) names_by_ch_[chan_key(kanal, /*analog=*/false)] = std::move(name);
 }
 void IoBroker::addAnalogOutMapping (int bus, int addr, int pin,  int kanal, std::string name){
-    out_map_[kanal] = OutTuple{bus, addr, pin, 1} ;
-    if (!name.empty()) names_[kanal] = std::move(name);
+    out_map_[chan_key(kanal, /*analog=*/true)] = OutTuple{bus, addr, pin, true} ;
+    if (!name.empty()) names_by_ch_[chan_key(kanal, /*analog=*/true)] = std::move(name);
     }
     
     void IoBroker::addImuMapping(int bus, int addr, int pin_id, int kanal, std::string name) {
@@ -125,9 +125,10 @@ bool IoBroker::waitPopIn(Telegram& out) {
 }
 
 void IoBroker::publishOut(const Telegram& t) {
-    auto it = out_map_.find(t.kanal);
+    const uint32_t ck = chan_key(t.kanal, t.analog);
+    auto it = out_map_.find(ck);
     if(it == out_map_.end()){
-        std::cout << "IoBroker: kein OUT-Mapping fuer Kanal " << t.kanal << "\n";
+        std::cout << "IoBroker: kein OUT-Mapping fuer Kanal " << t.kanal << " (analog=" << t.analog <<") \n";
         return;
     }
     const auto& [bus, addr, pin, analog] = it ->second;
@@ -145,6 +146,16 @@ void IoBroker::publishOut(const Telegram& t) {
 const char* IoBroker::nameOf(int kanal) const {
     auto it = names_.find(kanal);
     return (it != names_.end()) ? it->second.c_str() : nullptr;
+}
+
+const char* IoBroker::nameOf(int kanal, bool analog) const {
+    const uint32_t ck = chan_key(kanal, analog);
+    if (auto it = names_by_ch_.find(ck); it != names_by_ch_.end())
+        return it->second.c_str();
+    // Fallback: anderer Typ?
+    if (auto it2 = names_by_ch_.find(chan_key(kanal, !analog)); it2 != names_by_ch_.end())
+        return it2->second.c_str();
+    return nullptr;
 }
 
 uint32_t IoBroker::key(int bus, uint8_t addr, uint8_t pin, bool analog) {

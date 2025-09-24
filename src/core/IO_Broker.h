@@ -37,7 +37,8 @@ class IoBroker {
         void publishOut(const Telegram& t);
 
 
-        const char* nameOf(int kanal) const;
+        const char* nameOf(int kanal) const;    // fallback, wird nicht aktiv genutzt
+        const char* nameOf(int kanal, bool analog) const;
 
         // Json Loader
         bool loadConfig(const std::string& json_path);
@@ -46,11 +47,15 @@ class IoBroker {
     private:
         i2c::I2C_Manager& mgr_;
         static uint32_t key(int bus, uint8_t addr, uint8_t pin, bool analog);
-        std::unordered_map<uint32_t, int> ain_rate_by_dev_;
+        static uint32_t chan_key(int kanal, bool analog) {
+            return (static_cast<uint32_t>(kanal) << 1) | (analog ? 1u : 0u);
+        }
         std::unordered_map<uint32_t, int> in_map_;   // (bus,addr,pin,analog) -> kanal
         using OutTuple = std::tuple<int, int, int, bool>;
+
         std::unordered_map<int, OutTuple> out_map_;   // (bus,addr,pin,analog) -> kanal
-        std::unordered_map<int, std::string> names_; // kanal -> name
+        std::unordered_map<int, std::string> names_; // kanal -> name // Wird nicht aktiv genutzt
+        std::unordered_map<uint32_t, std::string> names_by_ch_; // Namen: (kanal,analog) -> Name
         std::string last_error_;
         std::function<void(const Telegram&)> on_telegram_;
         std::thread worker_;

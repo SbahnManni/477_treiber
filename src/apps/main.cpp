@@ -64,7 +64,7 @@ int main() {
     //pcf.setOnChange([](uint8_t v){ std::cout << "[0x38] Port=" << int(v) << "\n";  });
     i2c.subscribeInterrupt([&pcf_in]{ pcf_in.onInterrupt(); });
 
-    i2c::AnalogIn adc(i2c, 0x69, {8,9,10,11}, 50);
+    i2c::AnalogIn adc(i2c, 0x69, {0,1,2,3}, 50);
     i2c::MPU9250 imu(i2c, 0x68, 50);
     imu.begin();
 
@@ -82,7 +82,7 @@ int main() {
     io.setOnTelegram([&](const Telegram& t){
         #ifdef Diag
         std::cout   << "IN: kanal=" << t.kanal
-                        << " name=" << io.nameOf(t.kanal)
+                        << " name=" << io.nameOf(t.kanal, t.analog)
                         << " wert=" << t.wert 
                         << " (andi=" << t.analog << ")\n";
         #endif
@@ -109,20 +109,24 @@ int main() {
     auto handle = [&](const Telegram& t){
         // Hier kommt die Logic-Engine rein.
         
-        switch(t.kanal){
-            case 0: io.publishOut(Telegram{12, false, t.wert}); break;
-            case 1: io.publishOut(Telegram{13, false, t.wert}); break;
-            case 2: io.publishOut(Telegram{14, false, t.wert}); break;
-            case 3: io.publishOut(Telegram{15, false, t.wert}); break;
-            case 4: io.publishOut(Telegram{16, false, t.wert}); break;
-            case 5: io.publishOut(Telegram{17, false, t.wert}); break;
-            case 6: io.publishOut(Telegram{18, false, t.wert}); break;
-            case 7: io.publishOut(Telegram{19, false, t.wert}); break;
-
-            case HBL_DRUCK: io.publishOut(Telegram{A_TACHO, true, t.wert/2000}); break;
-            case HANDBREMSE: io.publishOut(Telegram{A_FAHRSPANNUNG, true, t.wert/2000}); break;
-            case HL_DRUCK: io.publishOut(Telegram{A_110V, true, t.wert/2000}); break;
-            case C_DRUCK: io.publishOut(Telegram{A_230V, true, t.wert/2000}); break;
+        if(t.analog){   //Analog
+            switch(t.kanal){
+                case HBL_DRUCK: io.publishOut(Telegram{A_TACHO, true, t.wert/2000}); break;
+                case HANDBREMSE: io.publishOut(Telegram{A_FAHRSPANNUNG, true, t.wert/2000}); break;
+                case HL_DRUCK: io.publishOut(Telegram{A_110V, true, t.wert/2000}); break;
+                case C_DRUCK: io.publishOut(Telegram{A_230V, true, t.wert/2000}); break;
+            }
+        }else{          //Digital
+            switch(t.kanal){
+                case 0: io.publishOut(Telegram{12, false, t.wert}); break;
+                case 1: io.publishOut(Telegram{13, false, t.wert}); break;
+                case 2: io.publishOut(Telegram{14, false, t.wert}); break;
+                case 3: io.publishOut(Telegram{15, false, t.wert}); break;
+                case 4: io.publishOut(Telegram{16, false, t.wert}); break;
+                case 5: io.publishOut(Telegram{17, false, t.wert}); break;
+                case 6: io.publishOut(Telegram{18, false, t.wert}); break;
+                case 7: io.publishOut(Telegram{19, false, t.wert}); break;
+            }
         }
     };
 
